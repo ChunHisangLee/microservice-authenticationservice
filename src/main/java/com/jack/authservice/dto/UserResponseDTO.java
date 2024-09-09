@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRolesDTO {
-    private Long id;
-    private Long userId;
-    private String role;
+public class UserResponseDTO {
+    private Long id;        // User's ID after successful registration
+    private String email;
 }

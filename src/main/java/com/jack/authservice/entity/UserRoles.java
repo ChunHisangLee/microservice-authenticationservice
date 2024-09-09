@@ -12,14 +12,14 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(exclude = "user")
 public class UserRoles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
@@ -29,8 +29,7 @@ public class UserRoles {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserRoles)) return false;
-        UserRoles userRoles = (UserRoles) o;
+        if (!(o instanceof UserRoles userRoles)) return false;
         return Objects.equals(id, userRoles.id);
     }
 
