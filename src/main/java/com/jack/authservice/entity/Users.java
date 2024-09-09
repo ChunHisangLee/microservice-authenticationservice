@@ -11,7 +11,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_email", columnList = "email")
+        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_username", columnList = "username")  // New index on username
 })
 @Getter
 @Setter
@@ -27,8 +28,8 @@ public class Users {
 
     @NotBlank(message = "Name cannot be blank")
     @Size(max = 100, message = "Name must be less than or equal to 100 characters")
-    @Column(nullable = false)
-    private String name;
+    @Column(unique = true, nullable = false)
+    private String username;
 
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email cannot be blank")

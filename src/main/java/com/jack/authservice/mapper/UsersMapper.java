@@ -10,14 +10,14 @@ public class UsersMapper {
     public UsersDTO toDto(Users users) {
         return UsersDTO.builder()
                 .id(users.getId())
-                .name(users.getName())
+                .username(users.getUsername())
                 .email(users.getEmail())
                 .build();
     }
 
     public Users toEntity(UsersDTO usersDTO) {
         return Users.builder()
-                .name(usersDTO.getName())
+                .username(usersDTO.getUsername())
                 .email(usersDTO.getEmail())
                 .password(usersDTO.getPassword()) // Ensure password is mapped if provided
                 .build();

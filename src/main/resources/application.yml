@@ -1,5 +1,5 @@
 server:
-  port: 8081  # Port for User Service
+  port: 8084  # Port for User Service
 
 spring:
   profiles:
@@ -12,7 +12,7 @@ spring:
     activate:
       on-profile: default
   datasource:
-    url: jdbc:postgresql://localhost:5432/userdb  # Dedicated database for User Service
+    url: jdbc:postgresql://localhost:5432/authdb  # Dedicated database for User Service
     username: postgres
     password: Ab123456
     driver-class-name: org.postgresql.Driver
@@ -50,6 +50,7 @@ app:
   jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
   jwtExpirationMs: 3600000
 
+
 security:
   authentication:
     enabled: false
@@ -61,7 +62,7 @@ spring:
     activate:
       on-profile: docker
   datasource:
-    url: jdbc:postgresql://db:5432/userdb
+    url: jdbc:postgresql://db:5432/authdb
     username: postgres
     password: Ab123456
     driver-class-name: org.postgresql.Driver
@@ -98,6 +99,8 @@ springdoc:
 app:
   jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
   jwtExpirationMs: 3600000
+
+
 
 security:
   authentication:
