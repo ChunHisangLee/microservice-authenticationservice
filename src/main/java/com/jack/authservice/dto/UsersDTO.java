@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class UsersDTO {
     private Long id;
     private String email;
-    private String password; // Only used for registration or updates, not returned in responses
+    private String password;
 }

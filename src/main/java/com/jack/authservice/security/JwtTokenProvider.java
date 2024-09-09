@@ -36,7 +36,7 @@ public class JwtTokenProvider {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
         return Jwts.builder()
-                .subject(userPrincipal.getUsername())
+                .subject(userPrincipal.getUsername())   // Use email instead of username
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(secretKey)
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
 
     // Extract email from the JWT token
     public String getEmailFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
+        return getClaimsFromToken(token).getSubject();  // Email is the subject in this case
     }
 
     // Extract all claims from the JWT token
@@ -77,11 +77,11 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        // Extract the username (or email) from the token
-        String username = getEmailFromToken(token);
+        // Extract the email (not username) from the token
+        String email = getEmailFromToken(token);
 
-        // Load the user details from the UserDetailsService using the extracted username
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        // Load the user details using the email
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);  // Here, "username" actually refers to email
 
         // Create an Authentication object with the user details and token (no credentials are passed)
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
