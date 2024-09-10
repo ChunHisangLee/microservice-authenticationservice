@@ -11,21 +11,6 @@ spring:
   config:
     activate:
       on-profile: default
-  datasource:
-    url: jdbc:postgresql://localhost:5432/authdb  # Dedicated database for User Service
-    username: postgres
-    password: Ab123456
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      auto-commit: true
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-    open-in-view: false  # Disable open-in-view to avoid potential performance issues
 
   rabbitmq:
     host: localhost
@@ -36,7 +21,7 @@ spring:
 # Logging level for the User Service
 logging:
   level:
-    com.jack.userservice: INFO
+    com.jack.authservice: INFO
 
 # SpringDoc settings for API documentation
 springdoc:
@@ -45,11 +30,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-# Security settings specific to the User Service
+# JWT settings specific to the Auth Service
 app:
   jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
   jwtExpirationMs: 3600000
-
 
 security:
   authentication:
@@ -61,21 +45,6 @@ spring:
   config:
     activate:
       on-profile: docker
-  datasource:
-    url: jdbc:postgresql://db:5432/authdb
-    username: postgres
-    password: Ab123456
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      auto-commit: true
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-    open-in-view: false  # Disable open-in-view in Docker as well
 
   rabbitmq:
     host: rabbitmq
@@ -86,7 +55,7 @@ spring:
 # Logging level for the User Service
 logging:
   level:
-    com.jack.userservice: INFO
+    com.jack.authservice: INFO
 
 # SpringDoc settings for API documentation
 springdoc:
@@ -95,12 +64,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-# Security settings specific to the User Service
+# JWT settings specific to the Auth Service
 app:
   jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
   jwtExpirationMs: 3600000
-
-
 
 security:
   authentication:

@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -22,45 +20,53 @@ public class JwtTokenProvider {
 
     private final SecretKey secretKey;
     private final int jwtExpirationMs;
-    private final UserDetailsService userDetailsService;
 
-    public JwtTokenProvider(UserDetailsService userDetailsService,
-                            @Value("${app.jwtSecret}") String jwtSecret,
+    public JwtTokenProvider(@Value("${app.jwtSecret}") String jwtSecret,
                             @Value("${app.jwtExpirationMs}") int jwtExpirationMs) {
         this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
         this.jwtExpirationMs = jwtExpirationMs;
-        this.userDetailsService = userDetailsService;
+        logger.info("Initialized JwtTokenProvider with expiration time: {} ms", jwtExpirationMs);
     }
 
-    public String generateToken(Authentication authentication) {
-        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-
-        return Jwts.builder()
-                .subject(userPrincipal.getUsername())   // Use email instead of username
+    public String generateTokenFromEmail(String email) {
+        logger.info("Generating JWT token for email: {}", email);
+        String token = Jwts.builder()
+                .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(secretKey)
                 .compact();
+
+        logger.info("Generated JWT token successfully for email: {}", email);
+        return token;
     }
 
 
     // Extract email from the JWT token
     public String getEmailFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();  // Email is the subject in this case
+        logger.debug("Extracting email from token: {}", token);
+        String email = getClaimsFromToken(token).getSubject();
+        logger.info("Extracted email: {}", email);
+        return email;
     }
 
     // Extract all claims from the JWT token
     public Claims getClaimsFromToken(String token) {
+        logger.debug("Parsing claims from token");
         JwtParser parser = Jwts.parser()
                 .verifyWith(secretKey)
                 .build();
 
         // Parse the claims from the token
-        return parser.parseSignedClaims(token).getPayload();
+        Claims claims = parser.parseSignedClaims(token).getPayload();
+        logger.debug("Parsed claims successfully");
+        return claims;
     }
 
     // Validate the JWT token
     public boolean validateToken(String token) {
+        logger.info("Validating JWT token: {}", token);
+
         try {
             JwtParser parser = Jwts.parser()
                     .verifyWith(secretKey)
@@ -68,22 +74,19 @@ public class JwtTokenProvider {
 
             // Parse and validate the token (will throw an exception if invalid)
             parser.parse(token);
+            logger.info("JWT token is valid");
             return true;
         } catch (Exception ex) {
-            // Handle the exception (log or handle the error as needed)
             System.err.println("Invalid JWT token: " + ex.getMessage());
             return false;
         }
     }
 
     public Authentication getAuthentication(String token) {
+        logger.info("Creating authentication object from JWT token");
         // Extract the email (not username) from the token
         String email = getEmailFromToken(token);
-
-        // Load the user details using the email
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);  // Here, "username" actually refers to email
-
-        // Create an Authentication object with the user details and token (no credentials are passed)
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        logger.info("Creating Authentication object for email: {}", email);
+        return new UsernamePasswordAuthenticationToken(email, null, null);  // No credentials or authorities
     }
 }
