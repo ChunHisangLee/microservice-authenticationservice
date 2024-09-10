@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +39,7 @@ public class WebSecurityConfig {
         if (authenticationEnabled) {
             logger.info("Authentication is ENABLED");
             http
-                    .csrf(csrf -> csrf.disable())  // Disable CSRF as we're using JWT tokens
+                    .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF as we're using JWT tokens
                     .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(SecurityConstants.getPublicUrls()).permitAll()  // Allow public URLs
                             .anyRequest().authenticated()  // Secure all other endpoints
@@ -48,7 +49,7 @@ public class WebSecurityConfig {
         } else {
             logger.info("Authentication is DISABLED");
             http
-                    .csrf(csrf -> csrf.disable())  // Disable CSRF
+                    .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF
                     .authorizeHttpRequests(authorize -> authorize
                             .anyRequest().permitAll()  // Allow all requests when authentication is disabled
                     );
