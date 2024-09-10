@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
             // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            authRequestDTO.getUsername(),
+                            authRequestDTO.getEmail(),
                             authRequestDTO.getPassword()
                     )
             );
@@ -53,11 +53,11 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             // Generate JWT token
             String jwt = jwtTokenProvider.generateToken(authentication);
-            logger.info("User '{}' successfully authenticated", authRequestDTO.getUsername());
+            logger.info("User '{}' successfully authenticated", authRequestDTO.getEmail());
             return new AuthResponseDTO(jwt);
 
         } catch (BadCredentialsException e) {
-            logger.error("Authentication failed for user '{}': {}", authRequestDTO.getUsername(), e.getMessage());
+            logger.error("Authentication failed for user '{}': {}", authRequestDTO.getEmail(), e.getMessage());
             throw new BadCredentialsException("Invalid username or password.");
         } catch (Exception e) {
             logger.error("Unexpected error during authentication: {}", e.getMessage());
@@ -75,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Create new user, encrypt password
         Users newUser = Users.builder()
-                .username(registrationDTO.getUsername())
+                .email(registrationDTO.getEmail())
                 .email(registrationDTO.getEmail())
                 .password(passwordEncoder.encode(registrationDTO.getPassword()))  // Encrypt password
                 .build();
@@ -83,12 +83,12 @@ public class AuthServiceImpl implements AuthService {
         // Save user to the repository
         Users savedUser = usersRepository.save(newUser);
 
-        logger.info("User '{}' successfully registered", savedUser.getUsername());
+        logger.info("User '{}' successfully registered", savedUser.getEmail());
 
         // Return user details in the response
         return UserResponseDTO.builder()
                 .id(savedUser.getId())
-                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
                 .email(savedUser.getEmail())
                 .build();
     }
