@@ -17,6 +17,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserServiceClient userServiceClient;  // Inject Feign client
     private final JwtTokenProvider jwtTokenProvider;
+    // Define the token expiration duration (e.g., 1 hour)
+    private static final Long JWT_EXPIRATION_MS = 3600000L;
 
     public AuthServiceImpl(UserServiceClient userServiceClient, JwtTokenProvider jwtTokenProvider) {
         this.userServiceClient = userServiceClient;
@@ -39,7 +41,11 @@ public class AuthServiceImpl implements AuthService {
             // If valid, generate JWT token
             String jwt = jwtTokenProvider.generateTokenFromEmail(authRequestDTO.getEmail());
             logger.info("Generated JWT token for user: {}", authRequestDTO.getEmail());
-            return new AuthResponseDTO(jwt);
+            return AuthResponseDTO.builder()
+                    .token(jwt)
+                    .tokenType("Bearer")  // Default token type is Bearer
+                    .expiresIn(JWT_EXPIRATION_MS)  // 1 hour expiration time
+                    .build();
 
         } catch (RestClientException e) {
             logger.error("Error communicating with user-service for authentication: {}", e.getMessage());
