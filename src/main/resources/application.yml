@@ -5,6 +5,10 @@ spring:
   profiles:
     active: default  # Default profile is active
 
+  data:
+    redis:
+      password: Ab123456
+
 # Logging level for the Auth Service
 logging:
   level:
@@ -34,9 +38,18 @@ spring:
     activate:
       on-profile: default
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 # Docker profile (for running in containers)
 ---
 spring:
   config:
     activate:
       on-profile: docker
+
+  data:
+    redis:
+      host: redis
+      port: 6379
