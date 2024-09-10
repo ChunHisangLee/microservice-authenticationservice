@@ -1,56 +1,19 @@
 
 services:
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: pricedb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Ab123456
-    ports:
-      - "5435:5432"
-    networks:
-      - assignment-network
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:latest
-    command: ["redis-server", "--requirepass", "Ab123456"]
-    ports:
-      - "6379:6379"  # Exposing Redis on port 6379
-    networks:
-      - assignment-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "Ab123456", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  app:
+  auth-service:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8084:8084"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pricedb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Ab123456
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: Ab123456
       SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      APP_JWTSECRET: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
+      APP_JWTEXPIRATIONMS: 3600000  # 1 hour
     networks:
-      - assignment-network
+      - microservice-network
 
 networks:
-  assignment-network:
-    driver: bridge
+  microservice-network:
+    external: true
+

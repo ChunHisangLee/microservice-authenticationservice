@@ -1,9 +1,31 @@
 server:
-  port: 8084  # Port for User Service
+  port: 8084  # Port for Auth Service
 
 spring:
   profiles:
-    active: default
+    active: default  # Default profile is active
+
+# Logging level for the Auth Service
+logging:
+  level:
+    com.jack.authservice: INFO
+
+# SpringDoc settings for API documentation
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# JWT settings specific to the Auth Service
+app:
+  jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
+  jwtExpirationMs: 3600000  # 1 hour
+
+# Security settings (auth-service should have authentication enabled)
+security:
+  authentication:
+    enabled: false
 
 # Default profile (local development and testing)
 ---
@@ -12,63 +34,9 @@ spring:
     activate:
       on-profile: default
 
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-
-# Logging level for the User Service
-logging:
-  level:
-    com.jack.authservice: INFO
-
-# SpringDoc settings for API documentation
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-
-# JWT settings specific to the Auth Service
-app:
-  jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
-  jwtExpirationMs: 3600000
-
-security:
-  authentication:
-    enabled: false
-
 # Docker profile (for running in containers)
 ---
 spring:
   config:
     activate:
       on-profile: docker
-
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: guest
-    password: guest
-
-# Logging level for the User Service
-logging:
-  level:
-    com.jack.authservice: INFO
-
-# SpringDoc settings for API documentation
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-
-# JWT settings specific to the Auth Service
-app:
-  jwtSecret: Xb34fJd9kPbvmJc84mDkV9b3Xb4fJd9kPbvmJc84mDkV9b3Xb34fJd9kPbvmJc84
-  jwtExpirationMs: 3600000
-
-security:
-  authentication:
-    enabled: false  # Enable authentication as the User Service typically manages user authentication
