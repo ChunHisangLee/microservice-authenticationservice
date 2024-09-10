@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -28,28 +27,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
         logger.info("Attempting to authenticate user with email: {}", authRequestDTO.getEmail());
+        // Delegate password validation to the user-service
+        boolean isPasswordValid = userServiceClient.verifyPassword(authRequestDTO);
 
-        try {
-            // Delegate the login validation to the user-service
-            boolean isValidUser = userServiceClient.validateUser(authRequestDTO);
-
-            if (!isValidUser) {
-                logger.error("Invalid credentials for user: {}", authRequestDTO.getEmail());
-                throw new BadCredentialsException("Invalid username or password.");
-            }
-
-            // If valid, generate JWT token
-            String jwt = jwtTokenProvider.generateTokenFromEmail(authRequestDTO.getEmail());
-            logger.info("Generated JWT token for user: {}", authRequestDTO.getEmail());
-            return AuthResponseDTO.builder()
-                    .token(jwt)
-                    .tokenType("Bearer")  // Default token type is Bearer
-                    .expiresIn(JWT_EXPIRATION_MS)  // 1 hour expiration time
-                    .build();
-
-        } catch (RestClientException e) {
-            logger.error("Error communicating with user-service for authentication: {}", e.getMessage());
-            throw new RuntimeException("Unable to authenticate. Please try again later.");
+        if (!isPasswordValid) {
+            logger.error("Invalid credentials for user: {}", authRequestDTO.getEmail());
+            throw new BadCredentialsException("Invalid username or password.");
         }
+
+        // If valid, generate JWT token
+        String jwt = jwtTokenProvider.generateTokenFromEmail(authRequestDTO.getEmail());
+        logger.info("Generated JWT token for user: {}", authRequestDTO.getEmail());
+        return AuthResponseDTO.builder()
+                .token(jwt)
+                .tokenType("Bearer")  // Default token type is Bearer
+                .expiresIn(JWT_EXPIRATION_MS)  // 1-hour expiration time
+                .build();
     }
 }
