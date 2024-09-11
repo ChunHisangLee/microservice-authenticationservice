@@ -62,13 +62,29 @@ public class TokenServiceImpl implements TokenService {
         return Boolean.TRUE.equals(redisTemplate.hasKey(BLACKLIST_PREFIX + token));
     }
 
+    @Override
+    public boolean validateToken(String token, Long userId) {
+        try {
+            JwtParser parser = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build();
+
+            Claims claims = parser.parseSignedClaims(token).getPayload();
+
+            Long tokenUserId = Long.parseLong(claims.getSubject());
+            return tokenUserId.equals(userId);
+        } catch (Exception e) {
+            logger.error("The Token is invalid: {}", e.getMessage());
+            return false;
+        }
+    }
+
     private long getTokenExpiryDuration(String token) {
         try {
             JwtParser parser = Jwts.parser()
                     .verifyWith(secretKey)
                     .build();
 
-            // Parse the claims from the token
             Claims claims = parser.parseSignedClaims(token).getPayload();
 
             Date expiration = claims.getExpiration();

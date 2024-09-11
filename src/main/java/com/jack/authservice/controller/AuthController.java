@@ -33,8 +33,9 @@ public class AuthController {
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);  // Remove "Bearer " prefix
+
             try {
-                tokenService.invalidateToken(token);  // Invalidate the token
+                tokenService.invalidateToken(token);
                 logger.info("Token invalidated successfully: {}", token);
                 return ResponseEntity.ok().build();
             } catch (Exception e) {
@@ -44,6 +45,33 @@ public class AuthController {
         } else {
             logger.warn("Invalid token provided for logout.");
             return ResponseEntity.badRequest().build();  // HTTP 400 Bad Request if no token found
+        }
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> validateToken(
+            @RequestHeader("Authorization") String token,
+            @RequestParam Long userId) {
+
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);  // Remove "Bearer " prefix
+
+            try {
+                boolean isValid = tokenService.validateToken(token, userId);
+                if (isValid) {
+                    logger.info("Token is valid for userId: {}", userId);
+                    return ResponseEntity.ok(true);
+                } else {
+                    logger.warn("Token is invalid or does not match userId: {}", userId);
+                    return ResponseEntity.status(401).body(false);  // Unauthorized if token is invalid
+                }
+            } catch (Exception e) {
+                logger.error("Error validating token: {}", e.getMessage());
+                return ResponseEntity.status(500).body(false);  // Internal server error in case of an exception
+            }
+        } else {
+            logger.warn("Invalid token format.");
+            return ResponseEntity.badRequest().body(false);  // Bad Request if token format is incorrect
         }
     }
 }
