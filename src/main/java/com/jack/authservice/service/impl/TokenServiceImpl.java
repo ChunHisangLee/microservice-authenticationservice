@@ -44,6 +44,13 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void invalidateToken(String token) {
         if (token != null && !token.trim().isEmpty()) {
+            // Check if token is already in the blacklist
+            Boolean isTokenBlacklisted = redisTemplate.hasKey(BLACKLIST_PREFIX + token);
+            if (Boolean.TRUE.equals(isTokenBlacklisted)) {
+                logger.info("Token is already blacklisted: {}", token);
+                return;  // Exit early if token is already blacklisted
+            }
+
             // Get token expiration duration
             long tokenExpiryDuration = getTokenExpiryDuration(token);
 
@@ -64,6 +71,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public boolean validateToken(String token, Long userId) {
+        if (isTokenBlacklisted(token)) {
+            logger.warn("Token is blacklisted: {}", token);
+            return false;
+        }
+
         try {
             JwtParser parser = Jwts.parser()
                     .verifyWith(secretKey)

@@ -6,6 +6,7 @@ import com.jack.authservice.service.AuthService;
 import com.jack.authservice.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,15 +33,15 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);  // Remove "Bearer " prefix
+            String jwtToken = token.substring(7);  // Remove "Bearer " prefix
 
             try {
-                tokenService.invalidateToken(token);
-                logger.info("Token invalidated successfully: {}", token);
+                tokenService.invalidateToken(jwtToken);
+                logger.info("Token invalidated successfully: {}", jwtToken);
                 return ResponseEntity.ok().build();
             } catch (Exception e) {
                 logger.error("Failed to invalidate token: {}", e.getMessage());
-                return ResponseEntity.status(500).build();  // HTTP 500 Internal Server Error
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
             logger.warn("Invalid token provided for logout.");
@@ -58,6 +59,7 @@ public class AuthController {
 
             try {
                 boolean isValid = tokenService.validateToken(token, userId);
+
                 if (isValid) {
                     logger.info("Token is valid for userId: {}", userId);
                     return ResponseEntity.ok(true);
