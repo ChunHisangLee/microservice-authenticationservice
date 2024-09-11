@@ -1,5 +1,6 @@
 package com.jack.authservice.controller;
 
+import com.jack.authservice.constants.SecurityConstants;
 import com.jack.authservice.dto.AuthRequestDTO;
 import com.jack.authservice.dto.AuthResponseDTO;
 import com.jack.authservice.service.AuthService;
@@ -31,8 +32,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
+    public ResponseEntity<Void> logout(@RequestHeader(SecurityConstants.AUTHORIZATION_HEADER) String token) {
+        if (token != null && token.startsWith(SecurityConstants.BEARER_PREFIX)) {
             String jwtToken = token.substring(7);  // Remove "Bearer " prefix
 
             try {
@@ -51,10 +52,10 @@ public class AuthController {
 
     @PostMapping("/validate")
     public ResponseEntity<Boolean> validateToken(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(SecurityConstants.AUTHORIZATION_HEADER) String token,
             @RequestParam Long userId) {
 
-        if (token != null && token.startsWith("Bearer ")) {
+        if (token != null && token.startsWith(SecurityConstants.BEARER_PREFIX)) {
             token = token.substring(7);  // Remove "Bearer " prefix
 
             try {

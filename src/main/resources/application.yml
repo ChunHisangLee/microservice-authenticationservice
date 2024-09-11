@@ -45,6 +45,10 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+# Add the AUTH_SERVICE_URL for Feign to use in Docker environment
+USER_SERVICE_URL: http://127.0.0.1:8081
+
 # Docker profile (for running in containers)
 ---
 spring:
@@ -56,3 +60,6 @@ spring:
     redis:
       host: redis
       port: 6379
+
+# Add the AUTH_SERVICE_URL for Feign to use in Docker environment
+USER_SERVICE_URL: http://user-service:8081

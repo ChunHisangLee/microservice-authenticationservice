@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "user-service", url = "http://127.0.0.1:8081")
+@FeignClient(name = "user-service", url = "${USER_SERVICE_URL:https://user-service:8081}")
 public interface UserServiceClient {
 
     @PostMapping("/api/users/verify-password")
